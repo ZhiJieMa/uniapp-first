@@ -1,1 +1,1 @@
-export const h5VerisonCode = 100;
+export const h5VerisonCode = 101;

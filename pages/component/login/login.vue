@@ -1,7 +1,7 @@
 <template>
 	<view style="margin: 0px 30rpx;">
 		<view class="content">
-			<image class="logo" src="../../../static/images/logo.png"></image>
+			<image class="logo" src="../../../static/images/m.png"></image>
 		</view>
 		
 		<uni-forms ref="signUpForm" :value="user" :rules="rules">

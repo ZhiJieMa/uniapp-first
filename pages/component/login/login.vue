@@ -1,24 +1,29 @@
 <template>
-	<view>
+	<view style="margin: 0px 30rpx;">
 		<view class="content">
 			<image class="logo" src="../../../static/images/logo.png"></image>
 		</view>
 		
 		<uni-forms ref="signUpForm" :value="user" :rules="rules">
-			<uni-forms-item label="账号" name="username">
+			<uni-forms-item label="账号:" name="username">
 				<uni-easyinput type="text" placeholder="请输入账号" v-model="user.username"/>
 			</uni-forms-item>
-			<uni-forms-item label="密码" name="password">
+			<uni-forms-item label="密码:" name="password">
 				<uni-easyinput type="password" placeholder="请输入密码" v-model="user.password"/>
 			</uni-forms-item>
-			<button form-type="submit" @click="handleSignUp">{{$t('login.title')}}</button>
+			<button form-type="submit" @click="handleSignUp">{{$t('login.btnName')}}</button>
 		</uni-forms>
+		
+		<view class="content version-view">
+			<uni-text class="flex-item">版本号: {{versionCode}}</uni-text>
+		</view>
 	</view>
 </template>
 
 <script>
 	import {sendRequest} from '../../../common/js/api.js';
 	import urls from '../../../constants/urls.js';
+	import {getAppVersion} from '../../../common/js/util.js'
 	export default {
 		data() {
 			return {
@@ -70,16 +75,39 @@
 			},
 			login() {
 				console.log(this.user);
+				uni.showLoading({title: '加载中...'});
 				// 请求后台校验账号密码
-				// sendRequest('POST', urls.loginAction, {}).then( (res) => {
-				// 	console.log("res: ", res);
-				// }).catch( (err) => {
-				// 	console.log("err: ", err);
-				// });
-				// 登录成功跳转主页
-				uni.navigateTo({
-					url: '/pages/component/index/index'
+				let data = {};
+				let _this = this;
+				sendRequest('POST', urls.loginAction, data, function(res) {
+					console.log("res: ", res);
+					uni.hideLoading();
+					// 测试时不管code是200 还是500 都让登录成功
+					if(res.code) {
+					// if(res.code === 200) {
+						// 登录成功保存登录信息并跳转主页
+						uni.navigateTo({
+							url: '/pages/component/index/index'
+						});
+						
+					} else {
+						uni.showModal({
+							title: '提示',
+							content: '账号或者密码输入错误',
+							success: function (ress) {
+								_this.clearLoginForm();
+							}
+						});
+					}
 				});
+			},
+			clearLoginForm() {
+				this.user = {};
+			}
+		},
+		computed: {
+			versionCode: function() {
+				return getAppVersion();
 			}
 		}
 	}
@@ -100,5 +128,9 @@
 		margin-left: auto;
 		margin-right: auto;
 		margin-bottom: 50rpx;
+	}
+	
+	.version-view {
+		height: 200rpx;
 	}
 </style>
